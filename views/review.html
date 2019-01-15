@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="shortcut icon" href="/static/img/favicon.png" />
+		<meta name="author" content="Unknown" />
+		<meta name="description" content="Beego sample app - Web IM" />
+		<meta name="keywords" content="Go, golang, beego, sample, Web IM">
+		<title>review</title>
+		<script src="/static/js/jquery-1.10.1.min.js"></script>
+		<link href="/static/css/review.css" rel="stylesheet" />
+		<script src="/static/js/review.js"></script>
+	</head>
+	<body>
+		<h1>Review 评测</h1>
+		<div class="wrap">
+			<span class="inner">时间：</span>
+			<input type="text" name="begin" placeholder="格式：20181101" maxlength="8">到
+			<input type="text" name="end" placeholder="格式：20181102" maxlength="8">
+			<span class="inner">名字：</span>
+			<input type="text" name="name">
+			<span class="inner">数量：</span>
+			<input type="text" name="num">
+			<button class="submit">创建新评测</button><br>
+			<span class="inner"><a href="/">返回主页</a></span><br>
+			<span class="inner">接口：</span>
+			<select id="s2">
+				<option value=""></option>
+			  	<option value="multiple">multiple</option>
+			  	<option value="single">single</option>
+			</select>
+			<table class="tl">
+				<tr>
+					<th>id</th>
+					<th>name</th>
+					<th>begintime</th>
+					<th>endtime</th>
+					<th>summary</th>
+					<th>detail</th>
+					<th>delete</th>
+				</tr>
+				
+				<!-- <tr>
+					<td></td>
+					<td><a href="/review/add?id={{.Id}}">{{$.Name}}</a></td>
+					<td>{{$.Time}}</td>
+					<td>{{$.Summary.String}}</td>
+					<td><a href="/review/showresult?id={{.Id}}">result</a></td>
+					<td><a href="/review/delete?id={{.Id}}">delete</a></td>
+					
+				</tr> -->
+				
+				
+				
+				
+			</table>
+			<div class="pages">
+				<span>共<b id="total"></b>页</span>
+				<span>当前第<b id="current"></b>页</span>
+				<a href="JavaScript:void(0)" id="next">下一页</a> 
+				<a href="JavaScript:void(0)" id="pre">上一页</a> 
+			</div>
+	</body>
+</html>
+
+
+	

@@ -1,0 +1,6 @@
+	* {margin:0px;}
+	h1{margin:0 auto; text-align: center;}
+	.wrap {font-size: 14px; font-family: "微软雅黑"; width:70%; border-collapse:collapse; text-align:center; margin: 30px auto; }
+	.wrap td,th {border: 2px solid black}
+
+	.edit {width: 50%; height: 40px; margin-top: 10px; border: 1px solid black; padding:10px;}

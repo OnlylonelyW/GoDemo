@@ -1,0 +1,84 @@
+{{template "base/base.html" .}}
+{{define "head"}}
+<title>INFO</title>
+{{end}}
+{{define "body"}}
+	<div class ="form">
+		<div class="table">
+			<h3>整题</h3>
+			<span class="t1">
+				检索结果：
+				<select id="s1">
+				  	<option value="1">有效</option>
+				  	<option value="0">无效</option>
+				</select>
+			</span>
+			<span class="t1">
+				无效结果类型：
+				<select id="s2">
+					<option value=""></option>
+				  	<option value="0">其他</option>
+				  	<option value="1">模糊</option>
+				  	<option value="2">非K12</option>
+				  	<option value="3">横屏拍摄</option>
+				  	<option value="4">纯口算、计算</option>
+				  	<option value="5">纯手写作业</option>
+				</select>
+			</span>
+			<span class="t1">
+				学段:
+				<select id="s3">
+					<option value=""></option>
+				  	<option value="0">无法判断</option>
+				  	<option value="1">小学</option>
+				  	<option value="2">中学</option>
+				</select>
+			</span>
+			<span class="t1">
+				学科:
+				<select id="s4">
+					<option value=""></option>
+				  	<option value="0">其他</option>
+				  	<option value="1">理科</option>
+				  	<option value="2">数学</option>
+				  	<option value="3">英语</option>
+				  	<option value="4">文科</option>
+				  	<option value="5">语文</option>
+				</select>
+			</span>
+			<span class="t1">
+				页面题目个数:
+				<input type="text" id="s5" class="nums" value="" onkeyup="value=value.replace(/[^\d]+/g,'')" >
+			</span>
+			<span class="t1">
+				切出题目个数:
+				<input type="text" id="s6" class="nums" value="" onkeyup="value=value.replace(/[^\d]+/g,'')" >
+			</span>
+			<span class="t1">
+				切准题目个数:
+				<input type="text" id="s7" class="nums" value="" onkeyup="value=value.replace(/[^\d]+/g,'')" >
+			</span>
+			<span class="t1">
+				搜对题目个数:
+				<input type="text" id="s8" class="nums" value="" onkeyup="value=value.replace(/[^\d]+/g,'')" >
+			</span>
+			<h3>分题</h3>
+			
+		</div>
+		<button class="show">show</button>
+		<button class="submit">submit</button>
+		<h2 id="suc"></h2>
+	</div>
+	<div class="body">
+		<span id="rev_id" style="display:none;">{{.rev_id}}</span>
+		<span id="ques_id" style="display:none;">{{.ques_id}}</span>
+		<div class="left">
+			<div class="inner">
+				<img src="{{.url}}" width="100%" height="100%">
+			</div>
+			
+		</div>
+		<div class="right">
+		</div>
+	</div>
+{{end}}

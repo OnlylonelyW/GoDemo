@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="shortcut icon" href="/static/img/favicon.png" />
+		<meta name="author" content="Unknown" />
+		<meta name="description" content="Beego sample app - Web IM" />
+		<meta name="keywords" content="Go, golang, beego, sample, Web IM">
+		<title>review sample</title>
+		<script src="/static/js/jquery-1.10.1.min.js"></script>
+		<link href="/static/css/wel3.css" rel="stylesheet" />
+		<script src="/static/js/wel3.js"></script>
+	</head>
+	<body>
+		<h1>Welcome<span id="id" style="display: none;">{{.Id}}</span><span id="num" style="display: none;">{{.num}}</span><span id="type" style="display: none;">{{.type}}</span></h1>
+		<div>
+			<a href="/review">返回评测主页</a>
+			<span class="inner">机型：</span>
+			<select id="s1">
+			  	<option value="null">null</option>
+			  	<option value="android">ios</option>
+			  	<option value="ios">android</option>
+			</select>
+			<span class="inner">接口：</span>
+			<select id="s2">
+				<option value="null">null</option>
+			  	<option value="multiple">multiple</option>
+			  	<option value="template">template</option>
+			  	<option value="single">single</option>
+			</select>
+			<button class="submit">筛选</button>
+			<h3>评测进度</h3>
+			<table class="process">
+				<tr>
+					<th></th>
+					<th>android</th>
+					<th>ios</th>
+					<th>合计</th>
+				</tr>
+				<tr class="p_line1">
+					<td>已完成</td>
+				</tr>
+				<tr class="p_line2">
+					<td >剩余</td>
+					
+				</tr>
+				<tr class="p_line3">
+					<td >总计</td>
+					
+				</tr>
+
+			</table>
+			<table class="wrap">
+				<tr>
+					<th>id</th>
+					<th>user</th>
+					<th>imei</th>
+					<th>action</th>
+					<th>date</th>
+					<th>state</th>
+					<th>detail</th>
+				</tr>
+			</table>
+		</div>
+	
+	</body>
+</html>

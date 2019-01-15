@@ -1,0 +1,35 @@
+{{template "base/base.html" .}}
+{{define "head"}}
+<title>welcome</title>
+{{end}}
+{{define "body"}}
+<h1>Welcome<span id="id" style="display: none;">{{.Id}}</span><span id="num" style="display: none;">{{.num}}</span></h1>
+	<div>
+
+		<span class="inner">机型：</span>
+		<select id="s1">
+		  	<option value="null">null</option>
+		  	<option value="android">ios</option>
+		  	<option value="ios">android</option>
+		</select>
+		<span class="inner">接口：</span>
+		<select id="s2">
+			<option value="null">null</option>
+		  	<option value="multiple">multiple</option>
+		  	<option value="template">template</option>
+		  	<option value="single">single</option>
+		</select>
+		<button class="submit">筛选</button>
+		<table class="wrap">
+			<tr>
+				<th>id</th>
+				<th>user</th>
+				<th>imei</th>
+				<th>action</th>
+				<th>date</th>
+				<th>state</th>
+			</tr>
+		</table>
+	</div>
+	
+{{end}}

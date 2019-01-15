@@ -1,0 +1,11 @@
+* {margin:0px;}
+	h1{margin:0 auto; text-align: center;}
+	.wrap{font-size: 14px; font-family: "微软雅黑";}
+
+	.tl {width:70%; border-collapse:collapse; text-align:center; margin: 100px auto; }
+	.wrap td,th {border: 2px solid black}
+	.pages{text-align: center;}
+
+	.inner{margin-left: 100px;}
+	button{line-height: 14px; margin-left: 40px;}
+	input{width: 10%; padding: 1px 2px;}
