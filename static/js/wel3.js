@@ -89,7 +89,7 @@
 	            	var a = document.createElement("a")
 	            	var nowstate = document.createElement('td');
 
-	            	a.setAttribute("href", "/review/info?id="+data.Data[i].Id+"&"+"rev_id="+rev_id);
+	            	a.setAttribute("href", "/review/infoimpl?id="+data.Data[i].Id+"&"+"rev_id="+rev_id);
 	            	a.setAttribute("target", "_blank")
 	            	str = data.Data[i].Date.split("_")
 	            	//console.log(str)

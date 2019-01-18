@@ -8,6 +8,7 @@ import (
 	 "strconv"
 	 "encoding/json"
 	 "github.com/astaxie/beego/logs"
+	 "database/sql"
 )
 
 type ReviewController struct {
@@ -72,28 +73,33 @@ func (this *ReviewController) Query() {
 func (this *ReviewController) Getall() {
 	name := this.GetString("name")
 	var id int
+	var reviewExited string              //判断评测是否已经被创建
+	tp := this.GetString("type")
+	num := this.GetString("num")
 	rev := ReviewEntity{
 		Name: name,
 		BeginTime: this.GetString("begin"),
 		EndTime: this.GetString("end"),
+		Num: sql.NullString{num, true},
+		Type: sql.NullString{tp, true},
 	}
-	id = insertReview(rev)
-	
-	num := this.GetString("num")
-	tp := this.GetString("type")
+	id, reviewExited = insertReview(rev)
+	fmt.Println(id)
 	var data []Info
 	var r_list *list.List
-	fmt.Println(id)
+
 	r_list = getReview(id, num, tp)
 
 	for ele := r_list.Front(); ele != nil; ele = ele.Next()  {
 		temp := ele.Value.(Info)
 		data = append(data, temp)
 	}
-
-	for _, temp := range data {
-		NinsertSample(id, temp.Id)
+	if reviewExited == "no" {
+		for _, temp := range data {
+			NinsertSample(id, temp.Id)
+		}
 	}
+	
 	
 	Nuseful(&data, id) //判断是否评测
 	//logs.Debug(data)
@@ -130,18 +136,8 @@ func (this *ReviewController) QueryInfo() {
 var rel_list2 = make(chan []Region, 1)
 
 //获取局部图信息
-func (this *ReviewController) GetInfo() {
-	name := this.GetString("id")
-	rev_id := this.GetString("rev_id")
-	image, json_str := selectById(name)
-	logs.Debug(json_str)
-	r_list := this.dealJson(json_str)
-    this.Data["IsInfo2"] = true
-	this.Data["url"] = image
-	this.Data["rev_id"] = rev_id
-	this.Data["ques_id"] = name
-	rel_list2 <- r_list
-	this.TplName = "info2.html"
+func (this *ReviewController) InfoImpl() {
+	this.TplName = "reviewinfo.html"
 }
 
 // 解析log中的json
@@ -178,56 +174,36 @@ func (this *ReviewController) dealJson(json_str string) []Region{
     		}
     		r_list = append(r_list, region)
     	}
-    	
+    
     }
     return r_list
 }
 
 
 func (this *ReviewController ) GetRegion() {
-	this.Data["json"] = <- rel_list2
+	name := this.GetString("id")
+	//rev_id := this.GetString("rev_id")
+	image, json_str := selectById(name)
+	//logs.Debug(json_str)
+	r_list := this.dealJson(json_str)
+    //this.Data["IsInfo2"] = true
+	this.Data["url"] = image
+	//this.Data["rev_id"] = rev_id
+	//this.Data["ques_id"] = name
+	d := make(map[string]interface{})
+	d["list"] = r_list
+	d["image"] = image
+	this.Data["json"] = d
 	this.ServeJSON()
-}
-
-//评测信息
-type ReviewInfo struct {
-	Page PageEntity
-	Part []PartEntity
-}
-
-//整页信息
-type PageEntity struct {
-	Result string
-	Rtype  string
-	Grade  string
-	Subject string
-	All_num string
-	Cut_num string
-	Acc_num string
-	Suc_num string
-	Rev_id string
-	Ques_id string
-}
-
-//分题信息
-type PartEntity struct{
-	Ques_id string
-	Id string
-	Similar string
-	Cut string
-	Photo string
 }
 
 //获得评测结果
 func (this *ReviewController) Result() {
-	//var r_list []Region
 	rev := ReviewInfo{} 
     json.Unmarshal(this.Ctx.Input.RequestBody, &rev)
-    logs.Debug(rev.Part==nil)
     insertRInfo(rev)
     this.Data["json"] = "hello"
     this.ServeJSON()
-
 }
 
 //截断为2位浮点数
@@ -357,6 +333,7 @@ func (this *ReviewController) GetDInfo() {
 	rev_id := this.GetString("rev_id")
 	ques_id := this.GetString("ques_id")
 	num := NRuseful(rev_id, ques_id)
+	fmt.Println(num)
 	if num ==2 {
 		this.Data["json"] = "false"
 	}else{

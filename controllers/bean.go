@@ -32,4 +32,34 @@ type ReviewEntity struct{
 	EndTime string
 	Summary sql.NullString 
 	Num sql.NullString
+	Type sql.NullString 
+}
+
+//评测信息
+type ReviewInfo struct {
+	Page PageEntity
+	Part []PartEntity
+}
+
+//整页信息
+type PageEntity struct {
+	Result string
+	Rtype  string
+	Grade  string
+	Subject string
+	All_num string
+	Cut_num string
+	Acc_num string
+	Suc_num string
+	Rev_id string
+	Ques_id string
+}
+
+//分题信息
+type PartEntity struct{
+	Ques_id string
+	Id string
+	Similar string
+	Cut string
+	Photo string
 }

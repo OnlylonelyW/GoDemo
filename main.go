@@ -1,9 +1,9 @@
 package main
 
 import (
-	_ "coscms.com/routers"
+	_ "searchq-operationsys/routers"
 	"github.com/astaxie/beego"
-	_ "coscms.com/controllers"
+	_ "searchq-operationsys/controllers"
 )
 
 func main() {

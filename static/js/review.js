@@ -38,12 +38,9 @@
 			}
 			$("#current").text(next)
 
-		})
+		});
 
-		$(".delete").click(function(){
-			deleteInfo(this);
-			alert("deleteInfo")
-		})
+		
 	});
 
 	//翻页
@@ -97,6 +94,8 @@
 			var t3 = $("<td></td>")
 			var t4 = $("<td></td>")
 			var t5 = $("<td></td>")
+			var type = $("<td></td>")
+			var num = $("<td></td>")
 			var t6 = $("<td></td>")
 			var t7 = $("<td><button class='delete' value="+data.Data[i].Id+">delete</button></td>")
 			t1.text(data.Data[i].Id)
@@ -105,19 +104,42 @@
 			t2.append(re_info);
 			t3.text(data.Data[i].BeginTime);
 			t4.text(data.Data[i].EndTime);
-			t5.text(data.Data[i].Summary);
+			t5.text(data.Data[i].Summary.String);
+			var typeInfo = data.Data[i].Type.String;
+			switch(typeInfo){
+				case "0":
+					type.text("全类型");
+					break;
+				case "1":
+					type.text("整页");
+					break;
+				case "2":
+					type.text("单题");
+					break;
+			}
+			//type.text(data.Data[i].Type);
+			num.text(data.Data[i].Num.String);
+//<td><a href="/review/showresult?id={{.Id}}">result</a></td>
+			var re_result = $('<a href="/review/showresult?id='+data.Data[i].Id+'"></a>"')
+			re_result.text("retult");
+			t6.append(re_result);
 
-			t6.text("retult");
 
 			tr.append(t1);
 			tr.append(t2);
 			tr.append(t3);
 			tr.append(t4);
 			tr.append(t5);
+			tr.append(type);
+			tr.append(num);
 			tr.append(t6);
 			tr.append(t7);
 			$(".tl").append(tr);
 		}
+		$(".delete").click(function(){
+			deleteInfo(this);
+			//alert("deleteInfo")
+		})
 		
 	}
 
@@ -129,7 +151,6 @@
 			dataType: "json",
 			success: function(data){
 				$(label).parent().parent().remove();
-				console.log(data)
 			},
 			error: function(){
 				alert("error")

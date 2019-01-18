@@ -6,41 +6,6 @@
 
 	$(function(){ 
 
-		// var  imgSrc = $("img").attr("src");
-		// $("img").load(function() {
-		// 	width = $("img").width();
-		// 	height = $('img').height();
-		// 	$.ajax({
-		// 		url:"/getRegion",
-		// 		type: "GET",
-		// 		dataType:"json",
-		// 		success:function(data) { 
-					
-		// 			if(data==null){
-		// 				return;
-		// 			}
-		// 			if(data[0].Area=="template"){
-		// 				deleteItem();
-		// 				add(data[0].Name);
-		// 				return;
-		// 			}
-		// 			if(data[0].Area=="single"){
-		// 				deleteItem();
-		// 				for (var i=0; i<data.length; i++){
-		// 					add(data[i].Name)
-		// 				}
-		// 				return;
-		// 			}
-		// 			console.log(data)
-		// 			getImageWidth(imgSrc, data); 
-					
-				 	
-		// 		},
-		// 		error: function(){
-		// 			alert("error")
-		// 		}
-		// 	});
-		// });
 		var id = getUrlParam("id")
 		urlLoad(id)
 

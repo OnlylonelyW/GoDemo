@@ -87,14 +87,14 @@ func selectData(t string, endday string) *list.List{
 //分页获取review评测结果
 func selectReview(num int) *list.List{
 	n1 := num*20
-	rows, err := db.Query("select id, name, endTime, beginTime, summary, num from review order by id desc limit ?, 20", n1)
+	rows, err := db.Query("select id, name, endTime, beginTime, summary, num, type from review order by id desc limit ?, 20", n1)
 	checkErr(err)
 	defer rows.Close()
 	re_list := list.New()
 
 	for rows.Next() {
 		review := ReviewEntity{}
-		err := rows.Scan(&review.Id, &review.Name, &review.EndTime, &review.BeginTime, &review.Summary, &review.Num)
+		err := rows.Scan(&review.Id, &review.Name, &review.EndTime, &review.BeginTime, &review.Summary, &review.Num, &review.Type)
 		checkErr(err)
 		re_list.PushBack(review)
 		
@@ -117,25 +117,24 @@ func selectTotalR() int {
 }
 
 // insert review
-func insertReview(r ReviewEntity) int {
+func insertReview(r ReviewEntity) (int, string) {
 	var num int
-	fmt.Println(r)
-	row1, _:= db.Query("select id from review where name=? and beginTime=? and endTime=?", r.Name, r.BeginTime, r.EndTime)
+	row1, _:= db.Query("select id from review where name=? and beginTime=? and endTime=? and type=?", r.Name, r.BeginTime, r.EndTime, r.Type.String)
 	defer row1.Close()
 	if row1.Next() {
 		row1.Scan(&num)
+		fmt.Println("existed")
 		row1.Close()
 		fmt.Println(num)
-		return num
+		return num, "yes"
 	}
-
-	db.Exec("insert into review(name, beginTime, endTime) values(?, ?, ?)", r.Name, r.BeginTime, r.EndTime)
-	rows, _ := db.Query("select id from review where name=? and beginTime=? and endTime=?", r.Name, r.BeginTime, r.EndTime)
+	db.Exec("insert into review(name, beginTime, endTime, type, num) values(?, ?, ?, ?, ?)", r.Name, r.BeginTime, r.EndTime, r.Type.String, r.Num.String)
+	rows, _ := db.Query("select id from review where name=? and beginTime=? and endTime=? and type=?", r.Name, r.BeginTime, r.EndTime, r.Type.String)
 	defer rows.Close()
 	if rows.Next() {
 		rows.Scan(&num)
 	}
-	return num
+	return num, "no"
 }
 
 // 获取review样本
@@ -150,18 +149,21 @@ func getReview(id int, num string, tp string) *list.List{
 	//times := strings.Split(time, "-")
 	var num2 string
 	db.QueryRow("select count(*) from reviewQuestion where idReview=?", id).Scan(&num2)
+	fmt.Println("已经存在样本数量：" + num2)
 	var rows *sql.Rows
 	var err error
 	if(num2==num){
 		rows, err = db.Query("select id, user, imei, action, date from log where id in (select idQuestion from reviewQuestion where idReview=?)", id)
 	}else{
 		switch tp {
-			case "":
-				rows, err = db.Query("select id, user, imei, action, date from log where date>="+begin+" and date<="+end+" order by rand() limit ?", num)
-			case "multiple":
+			case "0":
+				fmt.Println(num)
+				//select id, user, imei, action, date from log where date>=20181212 and date<=20181212 order by rand() limit 30;
+				rows, err = db.Query("select id, user, imei, action, date from log where date>=? and  date<=? order by rand() limit ?", begin, end, num)
+			case "1":
 				rows, err = db.Query("select id, user, imei, action, date from log where date>="+begin+" and date<="+end+" and action like ? order by rand() limit ?","%%multiple%%", num )
 
-			case "single":
+			case "2":
 				rows, err = db.Query("select id, user, imei, action, date from log where date>="+begin+" and date<="+end+" and action like ? order by rand() limit ?","%%" + "single" + "%%", num)
 		}
 	
@@ -213,7 +215,11 @@ func Nuseful(data *[]Info, id_rev int){
 }
 
 
-
+func existPartReview(id int, squenceid int) int {
+	var num int
+	db.QueryRow("select count(*) from reviewPartQuestion where idQuestion=? and sequenceId=?", id, squenceid).Scan(&num)
+	return num
+}
 
 
 
@@ -232,8 +238,8 @@ func insertRInfo(rev ReviewInfo) {
 	x8, _ :=  strconv.Atoi(page.Cut_num)
 	x9, _ :=  strconv.Atoi(page.Acc_num)
 	x10, _ :=  strconv.Atoi(page.Suc_num)
-	rows,_ :=db.Query("insert into rev_question values(?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE result=?, rtype=?, grade=?, subject=?, all_num=?, cut_num=?, acc_num=?, suc_num=? ", x1, x2, x3, x4, x5, x6, x7, x8 ,x9, x10, x3, x4, x5, x6, x7, x8 ,x9, x10)
-	defer rows.Close()
+	db.Exec("update reviewQuestion set resultType=?, errorType=?, grade=?, subject=?, allNumber=?, cutNumber=?, cutAccurateNumber=?, searchTrueNumber=? where idReview=? and idQuestion=?", x3, x4, x5, x6, x7, x8 ,x9, x10, x1, x2)
+	
 	if rev.Part!=nil {
 		for _, num := range rev.Part {
 			y1, _ := strconv.Atoi(num.Ques_id)
@@ -241,11 +247,13 @@ func insertRInfo(rev ReviewInfo) {
 			y3 := num.Similar
 			y4, _ := strconv.Atoi(num.Cut)
 			y5, _ :=  strconv.Atoi(num.Photo)
-			db.Exec("insert into rev_part_question values(?, ?, ?, ?, ?) on duplicate key update similar=? ,acc_num=?, suc_num=?", y1, y2, y3, y4, y5, y3, y4, y5)
-			
+			if existPartReview(y1, y2)==0 {
+				db.Exec("insert into reviewPartQuestion(idQuestion, sequenceId, similarId, cutAccurateNumber, searchTrueNumber) values(?, ?, ?, ?, ?)", y1, y2, y3, y4, y5)
+			}else{
+				db.Exec("update reviewPartQuestion set cutAccurateNumber=?, searchTrueNumber=? where idQuestion=? and sequenceId=?", y4, y5, y1, y2)
+			}
 		}
 	}
-	
 }
 
 //插入评论信息
@@ -257,10 +265,10 @@ func insertComment(id string, comment string){
 //有效样本相关值获取
 func SampleT(id string) SampleTrue {
 	var sampleT SampleTrue
-	db.QueryRow("select count(*) from rev_question where id_rev = ? and result=1", id).Scan(&sampleT.Total)
-	db.QueryRow("select count(*) from (select * from rev_question where id_rev= ? and result=1) q where q.grade =2", id).Scan(&sampleT.Middle)
-	db.QueryRow("select count(*) from (select * from rev_question where id_rev= ? and result=1 ) q where q.grade =1", id).Scan(&sampleT.Little)
-	db.QueryRow("select count(*) from (select * from rev_question where id_rev= ? and result=1 ) q where q.grade =0", id).Scan(&sampleT.Other)
+	db.QueryRow("select count(*) from reviewQuestion where idReview = ? and resultType=1", id).Scan(&sampleT.Total)
+	db.QueryRow("select count(*) from (select * from reviewQuestion where idReview= ? and resultType=1) q where q.grade =2", id).Scan(&sampleT.Middle)
+	db.QueryRow("select count(*) from (select * from reviewQuestion where idReview= ? and resultType=1 ) q where q.grade =1", id).Scan(&sampleT.Little)
+	db.QueryRow("select count(*) from (select * from reviewQuestion where idReview= ? and resultType=1 ) q where q.grade =0", id).Scan(&sampleT.Other)
 	return sampleT
 }	
 
@@ -283,20 +291,20 @@ type SampleFalse struct{
 //获取无效样本信息
 func SampleF(id string) SampleFalse {
 	var samplef SampleFalse
-	db.QueryRow("select count(*) from rev_question where id_rev = ? and result=0", id).Scan(&samplef.Total)
-	db.QueryRow("select count(*) from (select * from rev_question where id_rev= ? and result=0) q where q.rtype =0", id).Scan(&samplef.L0)
-	db.QueryRow("select count(*) from (select * from rev_question where id_rev= ? and result=0) q where q.rtype =1", id).Scan(&samplef.L1)
-	db.QueryRow("select count(*) from (select * from rev_question where id_rev= ? and result=0) q where q.rtype =2", id).Scan(&samplef.L2)
-	db.QueryRow("select count(*) from (select * from rev_question where id_rev= ? and result=0) q where q.rtype =3", id).Scan(&samplef.L3)
-	db.QueryRow("select count(*) from (select * from rev_question where id_rev= ? and result=0) q where q.rtype =4", id).Scan(&samplef.L4)
-	db.QueryRow("select count(*) from (select * from rev_question where id_rev= ? and result=0) q where q.rtype =5", id).Scan(&samplef.L5)
+	db.QueryRow("select count(*) from reviewQuestion where idReview = ? and resultType=0", id).Scan(&samplef.Total)
+	db.QueryRow("select count(*) from (select * from reviewQuestion where idReview= ? and resultType=0) q where q.errorType =0", id).Scan(&samplef.L0)
+	db.QueryRow("select count(*) from (select * from reviewQuestion where idReview= ? and resultType=0) q where q.errorType =1", id).Scan(&samplef.L1)
+	db.QueryRow("select count(*) from (select * from reviewQuestion where idReview= ? and resultType=0) q where q.errorType =2", id).Scan(&samplef.L2)
+	db.QueryRow("select count(*) from (select * from reviewQuestion where idReview= ? and resultType=0) q where q.errorType =3", id).Scan(&samplef.L3)
+	db.QueryRow("select count(*) from (select * from reviewQuestion where idReview= ? and resultType=0) q where q.errorType =4", id).Scan(&samplef.L4)
+	db.QueryRow("select count(*) from (select * from reviewQuestion where idReview= ? and resultType=0) q where q.errorType =5", id).Scan(&samplef.L5)
 	return samplef
 }
 
 //获取样本总数
 func getAllSample(id string) int {
 	var num int 
-	db.QueryRow("select count(*) from rev_question where id_rev = ? and result != 2", id).Scan(&num)
+	db.QueryRow("select count(*) from reviewQuestion where idReview = ? and resultType != 2", id).Scan(&num)
 	return num
 }
 
@@ -333,35 +341,35 @@ type M_ques struct {
 // 				  	<option value="2">中学</option>
 func GetMParts(id string) (Middle, M_ques) {
 	var middle Middle
-	db.QueryRow("select count(*) from rev_question where id_rev = ? and grade=2 and result=1", id).Scan(&middle.Total)
-	db.QueryRow("select count(*) from rev_question where id_rev = ? and grade=2 and subject=0 and result=1", id).Scan(&middle.L0)
-	db.QueryRow("select count(*) from rev_question where id_rev = ? and grade=2 and subject=1 and result=1", id).Scan(&middle.L1)
-	db.QueryRow("select count(*) from rev_question where id_rev = ? and grade=2 and subject=2 and result=1", id).Scan(&middle.L2)
-	db.QueryRow("select count(*) from rev_question where id_rev = ? and grade=2 and subject=3 and result=1", id).Scan(&middle.L3)
-	db.QueryRow("select count(*) from rev_question where id_rev = ? and grade=2 and subject=4 and result=1", id).Scan(&middle.L4)
-	db.QueryRow("select count(*) from rev_question where id_rev = ? and grade=2 and subject=5 and result=1", id).Scan(&middle.L5)
+	db.QueryRow("select count(*) from reviewQuestion where idReview = ? and grade=2 and resultType=1", id).Scan(&middle.Total)
+	db.QueryRow("select count(*) from reviewQuestion where idReview = ? and grade=2 and subject=0 and resultType=1", id).Scan(&middle.L0)
+	db.QueryRow("select count(*) from reviewQuestion where idReview = ? and grade=2 and subject=1 and resultType=1", id).Scan(&middle.L1)
+	db.QueryRow("select count(*) from reviewQuestion where idReview = ? and grade=2 and subject=2 and resultType=1", id).Scan(&middle.L2)
+	db.QueryRow("select count(*) from reviewQuestion where idReview = ? and grade=2 and subject=3 and resultType=1", id).Scan(&middle.L3)
+	db.QueryRow("select count(*) from reviewQuestion where idReview = ? and grade=2 and subject=4 and resultType=1", id).Scan(&middle.L4)
+	db.QueryRow("select count(*) from reviewQuestion where idReview = ? and grade=2 and subject=5 and resultType=1", id).Scan(&middle.L5)
 	middle.NoneEng = middle.Total- middle.L3
 
 	var m_ques M_ques
 
 	var acc [8]int
-	db.QueryRow("select sum(acc_num) from rev_question where id_rev=? and grade=2 and result=1", id).Scan(&acc[0])
+	db.QueryRow("select sum(cutAccurateNumber) from reviewQuestion where idReview=? and grade=2 and resultType=1", id).Scan(&acc[0])
 	for i:=1; i<7; i++ {
-		db.QueryRow("select sum(acc_num) from rev_question where id_rev=? and grade=2 and subject=? and result=1", id, i-1).Scan(&acc[i+1])
+		db.QueryRow("select sum(cutAccurateNumber) from reviewQuestion where idReview=? and grade=2 and subject=? and resultType=1", id, i-1).Scan(&acc[i+1])
 	}
 	acc[1] = acc[0]- acc[5]
 
 	var total [8]int
-	db.QueryRow("select sum(all_num) from rev_question where id_rev=? and grade=2 and result=1", id).Scan(&total[0])
+	db.QueryRow("select sum(allNumber) from reviewQuestion where idReview=? and grade=2 and resultType=1", id).Scan(&total[0])
 	for i:=1; i<7; i++ {
-		db.QueryRow("select sum(all_num) from rev_question where id_rev=? and grade=2 and subject=? and result=1", id, i-1).Scan(&total[i+1])
+		db.QueryRow("select sum(allNumber) from reviewQuestion where idReview=? and grade=2 and subject=? and resultType=1", id, i-1).Scan(&total[i+1])
 	}
 	total[1] = total[0]-total[5]
 
 	var suc [8]int
-	db.QueryRow("select sum(suc_num) from rev_question where id_rev=? and grade=2 and result=1", id).Scan(&suc[0])
+	db.QueryRow("select sum(searchTrueNumber) from reviewQuestion where idReview=? and grade=2 and resultType=1", id).Scan(&suc[0])
 	for i:=1; i<7; i++ {
-		db.QueryRow("select sum(suc_num) from rev_question where id_rev=? and grade=2 and subject=? and result=1", id, i-1).Scan(&suc[i+1])
+		db.QueryRow("select sum(searchTrueNumber) from reviewQuestion where idReview=? and grade=2 and subject=? and resultType=1", id, i-1).Scan(&suc[i+1])
 	}
 	suc[1] = suc[0]-suc[5]
 	
@@ -402,23 +410,24 @@ func getRDetail(id string) *list.List{
 
 // 得到一次样本评测中的详细数据
 func getRInfo(rev string, id_ques string) ReviewInfo {
-	rows, err := db.Query("select * from rev_question where id_ques=? and id_rev=?", id_ques, rev)
+	rows, err := db.Query("select * from reviewQuestion where idQuestion=? and idReview=?", id_ques, rev)
 	defer rows.Close()
 	checkErr(err)
 	var page PageEntity
+	var temp string
 	if rows.Next() {
-		err := rows.Scan(&page.Rev_id, &page.Ques_id, &page.Result, &page.Rtype, &page.Grade,&page.Subject, &page.All_num, &page.Cut_num, &page.Acc_num, &page.Suc_num)
+		err := rows.Scan(&temp, &page.Rev_id, &page.Ques_id, &page.Result, &page.Rtype, &page.Grade,&page.Subject, &page.All_num, &page.Cut_num, &page.Acc_num, &page.Suc_num)
 		checkErr(err)
 	}
 
 	var part []PartEntity
-	rows, err = db.Query("select * from rev_part_question where id_ques=?", id_ques)
-	defer rows.Close()
-	checkErr(err)
-	for rows.Next() {
+	rows1, err1 := db.Query("select * from reviewPartQuestion where idQuestion=?", id_ques)
+	defer rows1.Close()
+	checkErr(err1)
+	for rows1.Next() {
 		var p PartEntity
-		err := rows.Scan(&p.Ques_id, &p.Id, &p.Similar, &p.Cut, &p.Photo)
-		checkErr(err)
+		err2 := rows1.Scan(&temp, &p.Ques_id, &p.Id, &p.Similar, &p.Cut, &p.Photo)
+		checkErr(err2)
 		part = append(part, p)
 	}
 
@@ -433,7 +442,7 @@ func getRInfo(rev string, id_ques string) ReviewInfo {
 //判断样本是否评测
 func NRuseful(rev string, ques string) int {
 	var num int
-	db.QueryRow("select result from rev_question where id_rev=? and id_ques=?", rev, ques).Scan(&num)
+	db.QueryRow("select resultType from reviewQuestion where idReview=? and idQuestion=?", rev, ques).Scan(&num)
 	return num
 }
 

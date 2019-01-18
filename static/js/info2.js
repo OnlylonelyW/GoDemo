@@ -4,43 +4,10 @@
 	var width, height;
 	var n_w, n_h;
 	$(function(){ 
-		var  imgSrc = $("img").attr("src");
-		$("img").load(function() {
-			width = $("img").width();
-			height = $('img').height();
-			$.ajax({
-				url:"/review/getRegion",
-				type: "GET",
-				dataType:"json",
-				success:function(data) { 
-					
-					if(data==null){
-						return;
-					}
-					if(data[0].Area=="template"){
-						deleteItem();
-						add(data[0].Name);
-						return;
-					}
-					if(data[0].Area=="single"){
-						deleteItem();
-						for (var i=0; i<data.length; i++){
-							add(data[i].Name)
-						}
-						return;
-					}
-					console.log(data)
-					getImageWidth(imgSrc, data); 
-					
-					filling()
-				 	
-				},
-				error: function(){
-					alert("error")
-				}
-			});
+		loadRegion();
 
-		});
+
+
 		$('#s1').change(function(){
 			if($(this).val()==0) {
 				$(".d_area").each(function(i, item){
@@ -58,8 +25,8 @@
 		});
 
 		$(".submit").click(function(){
-			var rev_id = $("#rev_id").text();
-			var ques_id = $("#ques_id").text();
+			var rev_id = getUrlParam("rev_id");
+			var ques_id = getUrlParam("id");
 
 			var result = $("#s1").val();
 			var rtype = $("#s2").val();
@@ -126,10 +93,55 @@
 		
 	});
 
+	function loadRegion(){
+		$.ajax({
+			url:"/review/getRegion?id="+getUrlParam("id")+"&rev_id=" + getUrlParam("rev_id"),
+			type: "GET",
+			dataType:"json",
+			success:function(data) { 
+				if(data==null){
+					return;
+				}
+				console.log(data)
+				var imageUrl = data["image"];
+				var dat = data["list"];
+				var img = $('<img src="'+imageUrl+'" width="100%" height="100%">')
+				$(".inner").append(img)
+				if(dat==null){
+					return;
+				}
+
+				$("img").load(function() {
+					width = $("img").width();
+					height = $('img').height();
+					if(dat[0].Area=="template"){
+						deleteItem();
+						add(dat[0].Name);
+						return;
+					}
+					if(dat[0].Area=="single"){
+						deleteItem();
+						for (var i=0; i<dat.length; i++){
+							add(dat[i].Name)
+						}
+						return;
+					}
+					getImageWidth(imageUrl, dat); 
+				});
+				console.log(data)
+				
+				filling()
+			},
+			error: function(){
+				alert("error")
+			}
+		});
+	}
+
 	//填写已经评测的数据
 	function filling(){
-		var rev_id = $("#rev_id").text();
-		var ques_id = $("#ques_id").text();
+		var rev_id = getUrlParam("rev_id");
+		var ques_id = getUrlParam("id");
 		$.ajax({
 			url:"/review/detailinfo?rev_id="+rev_id+"&ques_id="+ques_id,
 			type:"GET",
@@ -206,3 +218,11 @@
 	    img.src = url;
 
 	}
+
+	//获取url中的参数
+    function getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+        if (r != null) return unescape(r[2]);
+        return ""; //返回参数值
+    }
