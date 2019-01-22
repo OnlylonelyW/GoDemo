@@ -24,13 +24,15 @@ func init() {
     beego.Router("/review/getRegion", &controllers.ReviewController{}, "get:GetRegion") //获取图片区域信息
     beego.Router("/review/detailinfo", &controllers.ReviewController{}, "get:GetDInfo") //获取评测填写的信息
     beego.Router("/review/result", &controllers.ReviewController{}, "*:Result")
-
+    //翻页
     beego.Router("/review/page", &controllers.ReviewController{}, "get:Page")
-    
+    //评测总结
     beego.Router("/review/showresult", &controllers.ReviewController{}, "get:ShowResult")
+     beego.Router("/review/resultinfo", &controllers.ReviewController{}, "get:ResultInfo")
+
     beego.Router("/review/comment", &controllers.ReviewController{}, "*:GetComment") //获取对评测结果的评论
     beego.Router("/review/getdetail", &controllers.ReviewController{}, "*:GetDetail")
-   
+
     beego.Router("/review/delete", &controllers.ReviewController{}, "get:Delete") //删除评测记录
 
 

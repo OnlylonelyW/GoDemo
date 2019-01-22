@@ -112,7 +112,6 @@ func selectTotalR() int {
 	if rows.Next() {
 		rows.Scan(&i)
 	}
-
 	return i
 }
 

@@ -213,8 +213,13 @@ func Round2(num float64) (float64) {
 	return v2
 }
 
-//总结评测结果
 func (this *ReviewController) ShowResult() {
+	this.TplName = "re_result.html"
+}
+
+
+//总结评测结果
+func (this *ReviewController) ResultInfo() {
 	id := this.GetString("id")
 	all_num := getAllSample(id)
 	sampleT := SampleT(id)
@@ -286,20 +291,21 @@ func (this *ReviewController) ShowResult() {
  			tb3_suc[2+i] = Round2(float64(m_ques.Suc[temp[i]+2])/float64(m_ques.Total[temp[i]+2]) * 100)
  		}
  	}
+ 	var d = make(map[string]interface{})
+ 	//d[]
 
- 	this.Data["sampleT"] = sampleT
- 	this.Data["sampleF"] = sampleF
- 	this.Data["table2"] = table2
- 	this.Data["table1"] = table1
- 	this.Data["middle"] = middle
- 	this.Data["m_ques"] = m_ques
- 	this.Data["tb3_1"] = tb3_1
- 	this.Data["tb3_suc"] = tb3_suc
- 	this.Data["tb3_acc"] = tb3_acc
- 	this.Data["IsResult"] = true
-	this.Data["json"] = "hello"
-	this.Data["id"] = id
-    this.TplName = "re_result.html"
+ 	d["sampleT"] = sampleT //有效样本数量
+ 	d["sampleF"] = sampleF //无效样本数量
+ 	d["table2"] = table2 //无效样本占比
+ 	d["table1"] = table1 // 有效样本占比
+ 	d["middle"] = middle // 中学样本数量
+ 	d["m_ques"] = m_ques // 中学题目数量
+ 	d["tb3_1"] = tb3_1 // 数量占比
+ 	d["tb3_suc"] = tb3_suc //搜对占比
+ 	d["tb3_acc"] = tb3_acc // 切对占比
+
+	this.Data["json"] = d
+	this.ServeJSON()
 }
 
 // 获取评语

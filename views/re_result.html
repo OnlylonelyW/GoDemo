@@ -1,176 +1,122 @@
-{{template "base/base.html" .}}
-{{define "head"}}
-<title>welcome</title>
-{{end}}
-{{define "body"}}
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="shortcut icon" href="/static/img/favicon.png" />
+		<meta name="author" content="Unknown" />
+		<meta name="description" content="Beego sample app - Web IM" />
+		<meta name="keywords" content="Go, golang, beego, sample, Web IM">
+		<title>review result</title>
+		<script src="/static/js/jquery-1.10.1.min.js"></script>
+		<link href="/static/css/result.css" rel="stylesheet" />
+		<script src="/static/js/result.js"></script>
+	</head>
+	<body>
 	<h1>评测结果<span style="display: none;" id="id">{{.id}}</span></h1>
-	<div>
-		<a href="/review">返回</a>
-		<h3>有效样本</h3>
-		{{$t1 := index .table1 0}}
-		{{$t2 := index .table1 1}}
-		{{$f1 := index .table2 0}}
-		{{$f2 := index .table2 1}}
-		{{$mid1 := index .tb3_1 0}}
-		{{$mid2 := index .tb3_1 1}}
-		{{$mid3 := index .tb3_1 2}}
-		<table class="wrap">
-			<tr>
-				<th></th>
-				<th>有效样本</th>
-				<th>中学</th>
-				<th>小学</th>
-				<th>无法判断</th>
-			</tr>
-			<tr>
-				<td>样本数量</td>
+		<div>
+			<a href="/review">返回</a>
+			<h3>有效样本</h3>
+			<table class="wrap" id="t1">
+				<tr>
+					<th></th>
+					<th>有效样本</th>
+					<th>中学</th>
+					<th>小学</th>
+					<th>无法判断</th>
+				</tr>
+				<tr class="t1_1">
+					<td >样本数量</td>
+					
+				</tr>
+				<tr class="t1_2" >
+					<td > 总样本占比</td>
+					
+					
+				</tr>
+				<tr class="t1_3">
+					<td>当前样本占比</td>
 				
-				<td>{{.sampleT.Total}}</td>
-				<td>{{.sampleT.Middle}}</td>
-				<td>{{.sampleT.Little}}</td>
-				<td>{{.sampleT.Other}}</td>
-			</tr>
-			<tr>
-				<td>总样本占比</td>
+				</tr>
+			</table>
+			<h3>无效样本</h3>
+			<table class="wrap" id="t2">
+				<tr>
+					<th></th>
+					<th>无效样本</th>
+					<th>横屏</th>
+					<th>纯口算、计算</th>
+					<th>纯手写作业</th>
+					<th>非K12</th>
+					<th>模糊</th>
+					<th>其他</th>
+				</tr><!-- 3 4  5 2 1 0 -->
+				<tr class="t2_1">
+					<td >样本数量</td>
+					
+				</tr>
+				<tr class="t2_2">
+
+					<td >总样本占比</td>
+					
+				</tr>
+				<tr class="t2_3">
+					<td >当前样本占比</td>
+					
+				</tr>
+			</table>
+			<h3>细化中学</h3>
+			<table class="wrap" id="t3">
+				<tr>
+					<th></th>
+					<th>中学</th>
+					<th>除英语外的学科</th>
+					<th>数学</th>
+					<th>理科</th>
+					<th>语文</th>
+					<th>文科</th>
+					<th>其他</th>
+					<th>英语</th>
+				</tr>
+				<tr class="t3_1"><!-- 2, 1, 5, 4, 0, 3 -->
+					<td >样本数量</td>
+					
+				</tr>
+				<tr class="t3_2">
+					<td >占总样本比例</td>
+					
+				</tr>
+				<tr class="t3_3">
+					<td>占有效样本比例</td>
+					
+				</tr>
+				<tr class="t3_4">
+					<td>占当前样本比例</td>
 				
-				{{range $t1}}
-				<td>{{.}}%</td>
-				{{end}}
-			</tr>
-			<tr>
-				<td>当前样本占比</td>
-				{{range $t2}}
-				<td>{{.}}%</td>
-				{{end}}
-			</tr>
-		</table>
-		<h3>无效样本</h3>
-		<table class="wrap">
-			<tr>
-				<th></th>
-				<th>无效样本</th>
-				<th>横屏</th>
-				<th>纯口算、计算</th>
-				<th>纯手写作业</th>
-				<th>非K12</th>
-				<th>模糊</th>
-				<th>其他</th>
-			</tr><!-- 3 4  5 2 1 0 -->
-			<tr>
-				<td>样本数量</td>
-				<td>{{.sampleF.Total}}</td>
-				<td>{{.sampleF.L3}}</td>
-				<td>{{.sampleF.L4}}</td>
-				<td>{{.sampleF.L5}}</td>
-				<td>{{.sampleF.L2}}</td>
-				<td>{{.sampleF.L1}}</td>
-				<td>{{.sampleF.L0}}</td>
-			</tr>
-			<tr>
+				</tr>
+				<tr class="t3_5">
+					<td>题目总量</td>
+				
+				</tr>
+				<tr class="t3_6">
+					<td >切准题目数量</td>
+				
+				</tr>
+				<tr class="t3_7">
+					<td >切对率</td>
+					
+				</tr>
+				<tr class="t3_8">
+					<td >搜对题目数量</td>
+					
+				</tr>
+				<tr class="t3_9">
+					<td >搜对率</td>
+					
+				</tr>
+			</table>
 
-				<td>总样本占比</td>
-				{{range $f1}}
-				<td>{{.}}%</td>
-				{{end}}
-			</tr>
-			<tr>
-				<td>当前样本占比</td>
-				{{range $f2}}
-				<td>{{.}}%</td>
-				{{end}}
-			</tr>
-		</table>
-		<h3>细化中学</h3>
-		<table class="wrap">
-			<tr>
-				<th></th>
-				<th>中学</th>
-				<th>除英语外的学科</th>
-				<th>数学</th>
-				<th>理科</th>
-				<th>语文</th>
-				<th>文科</th>
-				<th>其他</th>
-				<th>英语</th>
-			</tr>
-			<tr><!-- 2, 1, 5, 4, 0, 3 -->
-				<td>样本数量</td>
-				<td>{{.middle.Total}}</td>
-				<td>{{.middle.NoneEng}}</td>
-				<td>{{.middle.L2}}</td>
-				<td>{{.middle.L1}}</td>
-				<td>{{.middle.L5}}</td>
-				<td>{{.middle.L4}}</td>
-				<td>{{.middle.L0}}</td>
-				<td>{{.middle.L3}}</td>
-			</tr>
-			<tr>
-				<td>占总样本比例</td>
-				{{range $mid1}}
-				<td>{{.}}%</td>
-				{{end}}
-			</tr>
-			<tr>
-				<td>占有效样本比例</td>
-				{{range $mid2}}
-				<td>{{.}}%</td>
-				{{end}}
-			</tr>
-			<tr>
-				<td>占当前样本比例</td>
-				{{range $mid3}}
-				<td>{{.}}%</td>
-				{{end}}
-			</tr>
-			<tr>
-				<td>题目总量</td>
-				<td>{{index .m_ques.Total 0}}</td>
-				<td>{{index .m_ques.Total 1}}</td>
-				<td>{{index .m_ques.Total 4}}</td>
-				<td>{{index .m_ques.Total 3}}</td>
-				<td>{{index .m_ques.Total 7}}</td>
-				<td>{{index .m_ques.Total 6}}</td>
-				<td>{{index .m_ques.Total 2}}</td>
-				<td>{{index .m_ques.Total 5}}</td>
-			</tr>
-			<tr>
-				<td>切准题目数量</td>
-				<td>{{index .m_ques.Acc 0}}</td>
-				<td>{{index .m_ques.Acc 1}}</td>
-				<td>{{index .m_ques.Acc 4}}</td>
-				<td>{{index .m_ques.Acc 3}}</td>
-				<td>{{index .m_ques.Acc 7}}</td>
-				<td>{{index .m_ques.Acc 6}}</td>
-				<td>{{index .m_ques.Acc 2}}</td>
-				<td>{{index .m_ques.Acc 5}}</td>
-			</tr>
-			<tr>
-				<td>切对率</td>
-				{{range .tb3_acc}}
-				<td>{{.}}%</td>
-				{{end}}
-			</tr>
-			<tr>
-				<td>搜对题目数量</td>
-				<td>{{index .m_ques.Suc 0}}</td>
-				<td>{{index .m_ques.Suc 1}}</td>
-				<td>{{index .m_ques.Suc 4}}</td>
-				<td>{{index .m_ques.Suc 3}}</td>
-				<td>{{index .m_ques.Suc 7}}</td>
-				<td>{{index .m_ques.Suc 6}}</td>
-				<td>{{index .m_ques.Suc 2}}</td>
-				<td>{{index .m_ques.Suc 5}}</td>
-			</tr>
-			<tr>
-				<td>搜对率</td>
-				{{range .tb3_suc}}
-				<td>{{.}}%</td>
-				{{end}}
-			</tr>
-		</table>
-
-	</div>
-	<h3>总体评价</h3>
-	<div contenteditable="true" class="edit" id="editarea"></div>
-	<button id="submit">提交</button>
-{{end}}
+		</div>
+		<h3>总体评价</h3>
+		<div contenteditable="true" class="edit" id="editarea"></div>
+		<button id="submit">提交</button>
+	</body>
