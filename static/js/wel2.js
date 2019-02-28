@@ -74,6 +74,9 @@
 				if (data==null) {
 					return
 				}
+
+				//console.log(decodeURI(getUrlParam("name")));
+
 				rev_id = data.revid;
 				for (var i=0 ; i<data.Data.length; i++){
 					var li = document.createElement('tr');
@@ -128,6 +131,6 @@
     function getUrlParam(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
         var r = window.location.search.substr(1).match(reg);  //匹配目标参数
-        if (r != null) return unescape(r[2]);
+        if (r != null) return decodeURI(r[2]);
         return ""; //返回参数值
     }

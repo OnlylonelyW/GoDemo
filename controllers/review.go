@@ -83,8 +83,9 @@ func (this *ReviewController) Getall() {
 		Num: sql.NullString{num, true},
 		Type: sql.NullString{tp, true},
 	}
+	//logs.Debug(rev)
 	id, reviewExited = insertReview(rev)
-	fmt.Println(id)
+	//fmt.Println(id)
 	var data []Info
 	var r_list *list.List
 
