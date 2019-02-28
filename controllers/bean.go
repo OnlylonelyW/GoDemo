@@ -11,6 +11,15 @@ type Info struct{
 	Action string
 	Imei string
 	Date string
+	Result string    // 样本是否有效
+    Rtype  string    // 无效类型
+    Subject string   // 学科
+    Grade  string    // 学段
+    All_num string   // 题目总数
+    Cut_num string   // 切出数量
+    Acc_num string   // 切对数量
+    Suc_num string   // 搜对数量
+
 }
 //wel返回数据
 type Data struct{
@@ -62,4 +71,12 @@ type PartEntity struct{
 	Similar string
 	Cut string
 	Photo string
+}
+
+//有效样本数量
+type SampleTrue struct {
+	Total int
+	Middle int
+	Little int
+	Other int
 }

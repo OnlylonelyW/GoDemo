@@ -7,8 +7,10 @@
 			if(s1=="android"){
 				$("table tr").each(function(i, item){
 					if(i>0){
-						var td = $(item).find("td").eq(0);
-						if($(td).text().indexOf(s1)!=-1){
+						var td = $(item).find("td").eq(1);
+                      //  console.log(i + ", " + $(td).text())
+						if($(td).text().indexOf(s1)==-1){
+
 							$(item).css({"display":"none"})
 						}
 					}
@@ -16,7 +18,7 @@
 			}else if(s1=="ios"){
 				$("table tr").each(function(i, item){
 					if(i>0){
-						var td = $(item).find("td").eq(0);
+						var td = $(item).find("td").eq(1);
 						if($(td).text().indexOf(s1)!=-1){
 							$(item).css({"display":"none"})
 						}
@@ -27,7 +29,7 @@
 				case"multiple":
 					$("table tr").each(function(i, item){
 						if(i>0){
-							var td = $(item).find("td").eq(2);
+							var td = $(item).find("td").eq(3);
 							if($(td).text().indexOf(s2)==-1){
 								$(item).css({"display":"none"})
 							}
@@ -38,7 +40,7 @@
 				case"template":
 					$("table tr").each(function(i, item){
 						if(i>0){
-							var td = $(item).find("td").eq(2);
+							var td = $(item).find("td").eq(3);
 							if($(td).text().indexOf(s2)==-1){
 								$(item).css({"display":"none"})
 							}
@@ -48,7 +50,7 @@
 				case"single":
 					$("table tr").each(function(i, item){
 						if(i>0){
-							var td = $(item).find("td").eq(2);
+							var td = $(item).find("td").eq(3);
 							if($(td).text().indexOf(s2)==-1){
 								$(item).css({"display":"none"})
 							}

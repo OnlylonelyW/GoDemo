@@ -124,7 +124,7 @@ func (this *ReviewController) QueryInfo() {
 	}
 	nid, _ := strconv.Atoi(id)
 	Nuseful(&data, nid) //判断是否评测
-
+	//logs.Debug(data)
 	d := make(map[string]interface{})
 	d["Data"] = data
 	d["revid"] = id
@@ -280,15 +280,35 @@ func (this *ReviewController) ResultInfo() {
  	var temp =[]int{2, 1, 5, 4, 0, 3} //+2
  	if m_ques.Total[0]!=0 {
  		tb3_acc[0] = Round2(float64(m_ques.Acc[0])/float64(m_ques.Total[0]) * 100)
- 		tb3_acc[1] = Round2(float64(m_ques.Acc[1])/float64(m_ques.Total[1]) * 100)
+ 		if m_ques.Total[1]!=0 {
+ 			tb3_acc[1] = Round2(float64(m_ques.Acc[1])/float64(m_ques.Total[1]) * 100)
+ 		}else{
+ 			tb3_acc[1] = 0
+ 		}
+ 		
  		for i:=0; i<6; i++ {
- 			tb3_acc[2+i] = Round2(float64(m_ques.Acc[temp[i]+2])/float64(m_ques.Total[temp[i]+2]) * 100)
+ 			if m_ques.Total[temp[i]+2] != 0 {
+ 				tb3_acc[2+i] = Round2(float64(m_ques.Acc[temp[i]+2])/float64(m_ques.Total[temp[i]+2]) * 100)
+ 			}else{
+ 				tb3_acc[2+i] = 0;
+ 			}
+ 			
  		}
 
  		tb3_suc[0] = Round2(float64(m_ques.Suc[0])/float64(m_ques.Total[0]) * 100)
- 		tb3_suc[1] = Round2(float64(m_ques.Suc[1])/float64(m_ques.Total[1]) * 100)
+ 		if m_ques.Total[1] !=0 {
+ 			tb3_suc[1] = Round2(float64(m_ques.Suc[1])/float64(m_ques.Total[1]) * 100)
+ 		}else{
+ 			tb3_suc[1] = 0;
+ 		}
+ 		
  		for i:=0; i<6; i++ {
- 			tb3_suc[2+i] = Round2(float64(m_ques.Suc[temp[i]+2])/float64(m_ques.Total[temp[i]+2]) * 100)
+ 			if m_ques.Total[temp[i]+2] !=0 {
+ 				tb3_suc[2+i] = Round2(float64(m_ques.Suc[temp[i]+2])/float64(m_ques.Total[temp[i]+2]) * 100)
+ 			}else{
+ 				tb3_suc[2+i] = 0;
+ 			}
+ 			
  		}
  	}
  	var d = make(map[string]interface{})
@@ -303,6 +323,12 @@ func (this *ReviewController) ResultInfo() {
  	d["tb3_1"] = tb3_1 // 数量占比
  	d["tb3_suc"] = tb3_suc //搜对占比
  	d["tb3_acc"] = tb3_acc // 切对占比
+ 	
+
+
+ 	logs.Debug(d)
+
+
 
 	this.Data["json"] = d
 	this.ServeJSON()

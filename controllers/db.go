@@ -11,13 +11,6 @@ import (
 )
 
 
-//有效样本数量
-type SampleTrue struct {
-	Total int
-	Middle int
-	Little int
-	Other int
-}
 
 var db *sql.DB
 
@@ -382,8 +375,8 @@ func GetMParts(id string) (Middle, M_ques) {
 }
 
 // 得到一次评测所包含的样本信息
-func getRDetail(id string) *list.List{
-	rows, err := db.Query("select id, user, imei, action, date from log where id in (select idQuestion from reviewQuestion where idReview=?)", id)
+func getRDetail(id_rev  string) *list.List{
+	rows, err := db.Query("select id, user, imei, action, date from log where id in (select idQuestion from reviewQuestion where idReview=?)", id_rev)
 	defer rows.Close()
 	checkErr(err)
 	info_list := list.New()
@@ -395,14 +388,49 @@ func getRDetail(id string) *list.List{
 		var date string
 		err := rows.Scan(&id, &user, &imei, &action, &date)
 		checkErr(err)
-		info := Info{
-			Id:id,
-			User:user,
-			Imei:imei,
-			Action:action,
-    		Date : date,
+
+		// info := Info{
+		// 	Id:id,
+		// 	User:user,
+		// 	Imei:imei,
+		// 	Action:action,
+  //   		Date : date,
+		// }
+		// info_list.PushBack(info)
+
+		// get detail info
+		var info Info
+		var reviewInfo ReviewInfo
+		num := NRuseful(id_rev, strconv.Itoa(id))
+		if num == 2 {
+			info = Info{
+				Id:id,
+				User:user,
+				Imei:imei,
+				Action:action,
+	    		Date : date,
+	    	}
+		} else {
+			reviewInfo = getRInfo(id_rev, strconv.Itoa(id))
+			info = Info {
+				Id: id,
+				User:user,
+				Imei:imei,
+				Action:action,
+	    		Date : date,
+	    		Result: reviewInfo.Page.Result,
+	    		Rtype: reviewInfo.Page.Rtype,
+	    		Subject: reviewInfo.Page.Subject,
+	    		Grade: reviewInfo.Page.Grade,
+			    All_num: reviewInfo.Page.All_num,
+			    Cut_num: reviewInfo.Page.Cut_num,
+			    Acc_num: reviewInfo.Page.Acc_num,
+			    Suc_num:reviewInfo.Page.Suc_num,
+			}
 		}
+
 		info_list.PushBack(info)
+
 	}
 	return info_list
 }
